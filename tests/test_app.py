@@ -36,3 +36,28 @@ def test_delete_event_not_found():
     client = app.test_client()
     response = client.delete("/events/99")
     assert response.status_code == 404
+
+def test_welcome_route():
+    client = app.test_client()
+    response = client.get("/")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "message" in data
+    assert "Welcome" in data["message"]
+
+def test_get_events():
+    client = app.test_client()
+    response = client.get("/events")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 2
+    assert data[0]["title"] == "Tech Meetup"
+    assert data[1]["title"] == "Python Workshop"
+
+def test_create_event_missing_title():
+    client = app.test_client()
+    response = client.post("/events", json={})
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "error" in data
